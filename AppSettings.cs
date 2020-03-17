@@ -17,5 +17,7 @@ namespace AzureAlert.SMTP
         public string AAF_FromMailAddress { get; set; }
 
         public string AAF_RecipientMailAddresses { get; set; } //semicolon delimited
+
+        public int AAF_SMTPPort { get; set; }
     }
 }

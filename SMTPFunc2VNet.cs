@@ -11,6 +11,7 @@ using System.Net.Mail;
 using System.Net;
 using Microsoft.AspNetCore.WebHooks;
 using Serilog.Core;
+using Newtonsoft.Json.Linq;
 
 namespace AzureAlert.SMTP
 {
@@ -35,20 +36,23 @@ namespace AzureAlert.SMTP
                 funcTracer.LogInformation(_appSettings.AAF_RecipientMailAddresses); //azfunc trace
                 funcTracer.LogInformation(_appSettings.AAF_FromMailAddress); //azfunc trace
                 funcTracer.LogInformation(_appSettings.AAF_MailSubject); //azfunc trace
+                funcTracer.LogInformation(_appSettings.AAF_SMTPPort.ToString());
 
                 _logger.Information(_appSettings.AAF_SMTPServerIP);
                  _logger.Information(_appSettings.AAF_SMTPServerUserName);
               
                 _logger.Information("SMTPFunc2VNet-AMR triggered");
 
+                //https://docs.microsoft.com/en-us/azure/azure-monitor/platform/alerts-common-schema-definitions
+                //parse to common schema alert
+
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                //dynamic data = JsonConvert.DeserializeObject(requestBody);
 
-                _logger.Information($"SMTPFunc2VNet-AMR alert data received: {requestBody}");
+                var azureAlertCAS = DeserializeAlertJson(requestBody);
 
-                //var alert = JsonConvert.DeserializeObject<AzureAlertNotification>(requestBody);
+                string mailBody = GenerateMailBody(azureAlertCAS);
 
-                SendEmail(requestBody, funcTracer);
+                SendEmail(mailBody, funcTracer);
 
                 string responseMessage = $"SMTP WebHook executed successfully. {requestBody}";
                 
@@ -61,6 +65,33 @@ namespace AzureAlert.SMTP
             }
         }
 
+        private AzureAlertCAS DeserializeAlertJson(string jsonAlert)
+        {
+           JObject cas = JObject.Parse(jsonAlert);
+           JProperty data = cas.Property("data");
+           var aaCas = JsonConvert.DeserializeObject<AzureAlertCAS>(data.Value.ToString());
+           return aaCas;
+        }
+
+        private string GenerateMailBody(AzureAlertCAS alert)
+        {
+            var mailBody = new MailBody()
+            {
+               AlertRuleName = alert.Essentials.alertRule,
+               Severity = alert.Essentials.severity,
+               FiredDateTime = alert.Essentials.firedDateTime,
+               ResolvedDateTime = alert.Essentials.resolvedDateTime,
+               Description = alert.Essentials.description,
+               MonitorCondition = alert.Essentials.monitorCondition,
+               AlertResourceIds = alert.Essentials.alertTargetIDs,
+               Conditions = alert.AlertContext.condition.allOf
+            };
+
+            string mailBodyText = mailBody.GenerateMailBody();
+
+            return mailBodyText;
+        }
+
         private void SendEmail(string emailBody, ILogger funcTracer)
         {
             try 
@@ -69,7 +100,8 @@ namespace AzureAlert.SMTP
                 _logger.Information
                     ($"SMTPFunc2VNet-AMR Sending email to: {_appSettings.AAF_RecipientMailAddresses}");
 
-                SmtpClient client = new SmtpClient(_appSettings.AAF_SMTPServerIP);
+                SmtpClient client = new SmtpClient
+                    (_appSettings.AAF_SMTPServerIP, _appSettings.AAF_SMTPPort);
                 client.UseDefaultCredentials = false;
                 client.Credentials =
                     new NetworkCredential(_appSettings.AAF_SMTPServerUserName, _appSettings.AAF_SMTPServerPassword);

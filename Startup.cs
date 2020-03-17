@@ -32,7 +32,8 @@ namespace AzureAlert.SMTP
                 AAF_SMTPServerPassword = config.GetValue<string>("AAF_SMTPServerPassword"),
                 AAF_MailSubject = config.GetValue<string>("AAF_MailSubject"),
                 AAF_FromMailAddress = config.GetValue<string>("AAF_FromMailAddress"),
-                AAF_RecipientMailAddresses = config.GetValue<string>("AAF_RecipientMailAddress")
+                AAF_RecipientMailAddresses = config.GetValue<string>("AAF_RecipientMailAddress"),
+                AAF_SMTPPort = config.GetValue<int>("AAF_SMTPPort")
             };
 
             var logger = InitAppInsights(appSettings);
