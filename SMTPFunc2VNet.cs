@@ -39,7 +39,7 @@ namespace AzureAlert.SMTP
                 funcTracer.LogInformation(_appSettings.AAF_SMTPPort.ToString());
 
                 _logger.Information(_appSettings.AAF_SMTPServerIP);
-                 _logger.Information(_appSettings.AAF_SMTPServerUserName);
+                _logger.Information(_appSettings.AAF_SMTPServerUserName);
               
                 _logger.Information("SMTPFunc2VNet-AMR triggered");
 
@@ -103,6 +103,8 @@ namespace AzureAlert.SMTP
                 SmtpClient client = new SmtpClient
                     (_appSettings.AAF_SMTPServerIP, _appSettings.AAF_SMTPPort);
                 client.UseDefaultCredentials = false;
+                client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                client.EnableSsl = true;
                 client.Credentials =
                     new NetworkCredential(_appSettings.AAF_SMTPServerUserName, _appSettings.AAF_SMTPServerPassword);
 
