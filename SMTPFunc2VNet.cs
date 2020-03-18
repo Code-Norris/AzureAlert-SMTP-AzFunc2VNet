@@ -60,6 +60,7 @@ namespace AzureAlert.SMTP
             }
             catch(Exception ex)
             {
+                funcTracer.LogError(ex, ex.Message);
                 _logger.Error(ex, ex.Message);
                  return new BadRequestObjectResult(ex.ToString());
             }
