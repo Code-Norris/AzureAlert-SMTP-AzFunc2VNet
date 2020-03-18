@@ -61,7 +61,7 @@ namespace AzureAlert.SMTP
             catch(Exception ex)
             {
                 _logger.Error(ex, ex.Message);
-                return new StatusCodeResult(500);
+                 return new BadRequestObjectResult(ex.ToString());
             }
         }
 
@@ -101,10 +101,10 @@ namespace AzureAlert.SMTP
                     ($"SMTPFunc2VNet-AMR Sending email to: {_appSettings.AAF_RecipientMailAddresses}");
 
                 SmtpClient client = new SmtpClient
-                    (_appSettings.AAF_SMTPServerIP, _appSettings.AAF_SMTPPort);
+                    (_appSettings.AAF_SMTPServerIP); //, _appSettings.AAF_SMTPPort);
                 client.UseDefaultCredentials = false;
-                client.DeliveryMethod = SmtpDeliveryMethod.Network;
-                client.EnableSsl = true;
+                //client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                //client.EnableSsl = true;
                 client.Credentials =
                     new NetworkCredential(_appSettings.AAF_SMTPServerUserName, _appSettings.AAF_SMTPServerPassword);
 
