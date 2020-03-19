@@ -103,9 +103,10 @@ namespace AzureAlert.SMTP
 
                 SmtpClient client = new SmtpClient
                     (_appSettings.AAF_SMTPServerIP); //, _appSettings.AAF_SMTPPort);
+
                 client.UseDefaultCredentials = false;
-                //client.DeliveryMethod = SmtpDeliveryMethod.Network;
-                //client.EnableSsl = true;
+                client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                client.EnableSsl = true;
                 client.Credentials =
                     new NetworkCredential(_appSettings.AAF_SMTPServerUserName, _appSettings.AAF_SMTPServerPassword);
 
@@ -116,6 +117,15 @@ namespace AzureAlert.SMTP
                 
                 mailMessage.Body = emailBody;
                 mailMessage.Subject = _appSettings.AAF_MailSubject;
+
+                //at own risk.
+                //reason for bypass check is that App Service does not support certificate to be placed
+                //at Trusted Root store.
+                ServicePointManager.ServerCertificateValidationCallback += 
+                        (sender, cert, chain, error) =>
+                {
+                    return true;
+                };
 
                 client.Send(mailMessage);
                 
