@@ -7,6 +7,15 @@ namespace AzureAlert.SMTP
 {
     public class MailBody
     {
+        public MailBody()
+        {
+            if(subscriptionNames.Count <= 0)
+            {
+                subscriptionNames.Add("4d4ba1d0-92a2-49b7-8f98-85747a890a63", "mha0001-azr-012-spfprdpsg");
+                subscriptionNames.Add("19c78837-5f06-4647-a264-62c846ddc607", "mha0001-azr-021-mhaprdcom");
+            }
+        }
+
         public string AlertRuleName { get; set; }
 
         public string Severity { get; set; }
@@ -92,7 +101,10 @@ namespace AzureAlert.SMTP
             strBuilder.AppendLine();
             strBuilder.AppendLine();
 
-             strBuilder.Append("Resolved at: " + ResolvedDateTime.ToString("MM/dd/yyyy hh:mm tt"));
+            if(ResolvedDateTime == DateTime.MinValue)
+                strBuilder.Append("Resolved at: Not resolved yet");
+            else
+                strBuilder.Append("Resolved at: " + ResolvedDateTime.ToString("MM/dd/yyyy hh:mm tt"));
             strBuilder.AppendLine();
             strBuilder.AppendLine();
 
@@ -102,7 +114,8 @@ namespace AzureAlert.SMTP
             var affectedRcs = GetAffectedResources();
             foreach(var rsc in affectedRcs)
             {
-                strBuilder.Append("Subscription: " + rsc.Subscription);
+                strBuilder.Append
+                    ("Subscription: " + subscriptionNames.GetValueOrDefault(rsc.Subscription));
                 strBuilder.AppendLine();
                 strBuilder.Append("ResourceGroup: " + rsc.ResourceGroup);
                 strBuilder.AppendLine();
@@ -122,5 +135,7 @@ namespace AzureAlert.SMTP
 
             return strBuilder.ToString();
         }
+
+        private static Dictionary<string,string> subscriptionNames = new Dictionary<string,string>();
     }
 }
