@@ -54,6 +54,8 @@ namespace AzureAlert.SMTP
 
                 SendEmail(mailBody, funcTracer);
 
+                _logger.Information("Request received from Azure ALert: " + requestBody);
+                
                 string responseMessage = $"SMTP WebHook executed successfully. {requestBody}";
                 
                 return new  OkObjectResult(responseMessage);

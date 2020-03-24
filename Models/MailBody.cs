@@ -97,14 +97,14 @@ namespace AzureAlert.SMTP
             strBuilder.AppendLine();
             strBuilder.AppendLine();
 
-            strBuilder.Append("Alert fired at: " + FiredDateTime.ToString("MM/dd/yyyy hh:mm tt"));
+            strBuilder.Append("Alert fired at: " + FiredDateTime.AddHours(8).ToString("MM/dd/yyyy hh:mm tt"));
             strBuilder.AppendLine();
             strBuilder.AppendLine();
 
             if(ResolvedDateTime == DateTime.MinValue)
                 strBuilder.Append("Resolved at: Not resolved yet");
             else
-                strBuilder.Append("Resolved at: " + ResolvedDateTime.ToString("MM/dd/yyyy hh:mm tt"));
+                strBuilder.Append("Resolved at: " + ResolvedDateTime.AddHours(8).ToString("MM/dd/yyyy hh:mm tt"));
             strBuilder.AppendLine();
             strBuilder.AppendLine();
 
