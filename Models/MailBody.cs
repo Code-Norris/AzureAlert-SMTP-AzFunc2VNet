@@ -85,6 +85,16 @@ namespace AzureAlert.SMTP
         {
             var strBuilder = new StringBuilder();
 
+             strBuilder.AppendLine();
+             strBuilder.Append
+                ("For Severity 3, Severity 3 - NCS Level 1 Support - xxxx.xxx.xxx is currently looking into the issue.");
+             strBuilder.AppendLine();
+             strBuilder.Append("For Severity 2, Severity 2 - NCS Level 2 Support - xxxx.xxx.xxx is currently looking into the issue.");
+             strBuilder.AppendLine();
+             strBuilder.Append("For Severity 1, Severity 1 - NCS Level 2 Support - xxxx.xxx.xxx is currently looking into the issue.");
+             strBuilder.AppendLine();
+             strBuilder.AppendLine();
+
             strBuilder.Append("AlertRule: " + AlertRuleName);
             strBuilder.AppendLine();
             strBuilder.AppendLine();
@@ -130,7 +140,6 @@ namespace AzureAlert.SMTP
             strBuilder.Append("Alert Conditions:");
             strBuilder.AppendLine();
             strBuilder.AppendLine(conditions);
-            strBuilder.AppendLine();
             strBuilder.AppendLine();
 
             return strBuilder.ToString();
