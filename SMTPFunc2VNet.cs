@@ -38,15 +38,11 @@ namespace AzureAlert.SMTP
                 funcTracer.LogInformation(_appSettings.AAF_MailSubject); //azfunc trace
                 funcTracer.LogInformation(_appSettings.AAF_SMTPPort.ToString());
 
-                _logger.Information(_appSettings.AAF_SMTPServerIP);
-                _logger.Information(_appSettings.AAF_SMTPServerUserName);
-              
-                _logger.Information("SMTPFunc2VNet-AMR triggered");
-
                 //https://docs.microsoft.com/en-us/azure/azure-monitor/platform/alerts-common-schema-definitions
                 //parse to common schema alert
 
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+                _logger.Information("Request received from Azure ALert: " + requestBody);
 
                 var azureAlertCAS = DeserializeAlertJson(requestBody);
 
@@ -54,8 +50,6 @@ namespace AzureAlert.SMTP
 
                 SendEmail(mailBody, funcTracer);
 
-                _logger.Information("Request received from Azure ALert: " + requestBody);
-                
                 string responseMessage = $"SMTP WebHook executed successfully. {requestBody}";
                 
                 return new  OkObjectResult(responseMessage);
@@ -101,7 +95,7 @@ namespace AzureAlert.SMTP
             {
                 funcTracer.LogInformation($"SMTPFunc2VNet-AMR Sending email to: {_appSettings.AAF_RecipientMailAddresses}");
                 _logger.Information
-                    ($"SMTPFunc2VNet-AMR Sending email to: {_appSettings.AAF_RecipientMailAddresses}");
+                    ($"Sending email to: {_appSettings.AAF_RecipientMailAddresses}");
 
                 SmtpClient client = new SmtpClient
                     (_appSettings.AAF_SMTPServerIP); //, _appSettings.AAF_SMTPPort);

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -9,11 +10,7 @@ namespace AzureAlert.SMTP
     {
         public MailBody()
         {
-            if(subscriptionNames.Count <= 0)
-            {
-                subscriptionNames.Add("4d4ba1d0-92a2-49b7-8f98-85747a890a63", "mha0001-azr-012-spfprdpsg");
-                subscriptionNames.Add("19c78837-5f06-4647-a264-62c846ddc607", "mha0001-azr-021-mhaprdcom");
-            }
+            InitCollections();
         }
 
         public string AlertRuleName { get; set; }
@@ -31,7 +28,6 @@ namespace AzureAlert.SMTP
         public List<AllOf> Conditions { get; set; }
 
         public IEnumerable<string> AlertResourceIds { get; set; }
-
 
         public string GenerateMailBody()
         {
@@ -86,15 +82,11 @@ namespace AzureAlert.SMTP
             var strBuilder = new StringBuilder();
 
              strBuilder.AppendLine();
-             strBuilder.Append
-                ("For Severity 3, Severity 3 - NCS Level 1 Support - xxxx.xxx.xxx is currently looking into the issue.");
-             strBuilder.AppendLine();
-             strBuilder.Append("For Severity 2, Severity 2 - NCS Level 2 Support - xxxx.xxx.xxx is currently looking into the issue.");
-             strBuilder.AppendLine();
-             strBuilder.Append("For Severity 1, Severity 1 - NCS Level 2 Support - xxxx.xxx.xxx is currently looking into the issue.");
+             string supportMsg = severityMessages.FirstOrDefault(x => x.Key == Severity).Value;
+             strBuilder.Append(supportMsg);
              strBuilder.AppendLine();
              strBuilder.AppendLine();
-
+             
             strBuilder.Append("AlertRule: " + AlertRuleName);
             strBuilder.AppendLine();
             strBuilder.AppendLine();
@@ -145,6 +137,25 @@ namespace AzureAlert.SMTP
             return strBuilder.ToString();
         }
 
+        private void InitCollections()
+        {
+            if(subscriptionNames.Count == 0)
+            {
+                subscriptionNames.Add("4d4ba1d0-92a2-49b7-8f98-85747a890a63", "mha0001-azr-012-spfprdpsg");
+                subscriptionNames.Add("19c78837-5f06-4647-a264-62c846ddc607", "mha0001-azr-021-mhaprdcom");
+            }
+
+            if(severityMessages.Count == 0)
+            {
+                    severityMessages.Add("Sev4", String.Empty);
+                    severityMessages.Add("Sev3", "For Severity 3, Severity 3 - NCS Level 1 Support - xxxx.xxx.xxx is currently looking into the issue.");
+                    severityMessages.Add("Sev2", "For Severity 2, Severity 2 - NCS Level 2 Support - xxxx.xxx.xxx is currently looking into the issue.");
+                    severityMessages.Add("Sev1", "For Severity 1, Severity 1 - NCS Level 2 Support - xxxx.xxx.xxx is currently looking into the issue.");
+                    severityMessages.Add("Sev0", "For Severity 1, Severity 1 - NCS Level 2 Support - xxxx.xxx.xxx is currently looking into the issue.");
+            }
+        }
+
         private static Dictionary<string,string> subscriptionNames = new Dictionary<string,string>();
+        private static Dictionary<string,string> severityMessages = new Dictionary<string,string>();
     }
 }
